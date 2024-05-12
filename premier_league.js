@@ -428,3 +428,6 @@ db.posiciones.insertMany([
         "perdidos": 13
     }
 ])
+
+// Solicitamos todos los documentos incluidos en equipos
+db.equipos.find()
