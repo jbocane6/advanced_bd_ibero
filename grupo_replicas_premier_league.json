@@ -1,0 +1,158 @@
+// Crear nodos, en este caso 3
+replicaPremierLeague = new ReplSetTest ({name: "pruebaReplica", nodes: 3})
+// Inicializamos los nodos
+replicaPremierLeague.startSet()
+// Iniciamos la funcionalida de réplica
+replicaPremierLeague.initiate()
+// Nos conectamos al primer nodo
+conn=new Mongo("Metal2022:20000")
+// Obtenemos la bd premier_league
+testDB=conn.getDB("premier_league")
+// Validamos si es el nodo principal
+testDB.isMaster()
+// Insertamos valores en la BD
+testDB.resultados.insert([
+    {
+        "fecha": "13/09/2023",
+        "jornada": 4,
+        "local": "Chelsea",
+        "visitante": "Liverpool",
+        "estadio": "Stamford Bridge",
+        "resultado": "2 - 1"
+    },
+    {
+        "fecha": "19/11/2023",
+        "jornada": 7,
+        "local": "Tottenham Hotspur",
+        "visitante": "Manchester United",
+        "estadio": "Tottenham Hotspur Stadium",
+        "resultado": "2 - 2"
+    },
+    {
+        "fecha": "02/08/2023",
+        "jornada": 3,
+        "local": "Newcastle United",
+        "visitante": "Liverpool",
+        "estadio": "St. James' Park",
+        "resultado": "4 - 2"
+    },
+    {
+        "fecha": "13/09/2023",
+        "jornada": 3,
+        "local": "Arsenal",
+        "visitante": "Manchester United",
+        "estadio": "Emirates Stadium",
+        "resultado": "3 - 3"
+    },
+    {
+        "fecha": "20/09/2023",
+        "jornada": 5,
+        "local": "Arsenal",
+        "visitante": "Tottenham Hotspur",
+        "estadio": "Emirates Stadium",
+        "resultado": "2 - 1"
+    },
+    {
+        "fecha": "23/09/2023",
+        "jornada": 7,
+        "local": "Tottenham Hotspur",
+        "visitante": "Liverpool",
+        "estadio": "Tottenham Hotspur Stadium",
+        "resultado": "1 - 1"
+    },
+    {
+        "fecha": "18/10/2023",
+        "jornada": 9,
+        "local": "Arsenal",
+        "visitante": "Manchester City",
+        "estadio": "Emirates Stadium",
+        "resultado": "0 - 0"
+    },
+    {
+        "fecha": "21/11/2023",
+        "jornada": 10,
+        "local": "Chelsea",
+        "visitante": "Arsenal",
+        "estadio": "Stamford Bridge",
+        "resultado": "0 - 2"
+    },
+    {
+        "fecha": "29/11/2023",
+        "jornada": 11,
+        "local": "Manchester United",
+        "visitante": "Manchester City",
+        "estadio": "Old Trafford",
+        "resultado": "4 - 3"
+    },
+    {
+        "fecha": "14/11/2023",
+        "jornada": 12,
+        "local": "Newcastle United",
+        "visitante": "Arsenal",
+        "estadio": "St. James' Park",
+        "resultado": "1 - 2"
+    },
+    {
+        "fecha": "16/11/2023",
+        "jornada": 10,
+        "local": "Tottenham Hotspur",
+        "visitante": "Chelsea",
+        "estadio": "Tottenham Hotspur Stadium",
+        "resultado": "3 - 4"
+    },
+    {
+        "fecha": "22/11/2023",
+        "jornada": 13,
+        "local": "Chelsea",
+        "visitante": "Manchester City",
+        "estadio": "Stamford Bridge",
+        "resultado": "0 - 4"
+    },
+    {
+        "fecha": "25/10/2023",
+        "jornada": 11,
+        "local": "Manchester City",
+        "visitante": "Liverpool",
+        "estadio": "Etihad Stadium",
+        "resultado": "2 - 1"
+    },
+    {
+        "fecha": "22/12/2023",
+        "jornada": 16,
+        "local": "Newcastle United",
+        "visitante": "Manchester United",
+        "estadio": "St. James' Park",
+        "resultado": "1 - 3"
+    },
+    {
+        "fecha": "23/12/2023",
+        "jornada": 16,
+        "local": "Manchester City",
+        "visitante": "Tottenham Hotspur",
+        "estadio": "Etihad Stadium",
+        "resultado": "5 - 3"
+    }
+])
+// Validamos si se insertaron registros
+testDB.resultados.count()
+// Nos conectamos al segundo nodo
+connSecondary = new Mongo("Metal2022:20001")
+secondaryTestDB = connSecondary.getDB("premier_league")
+// Validamos si es el nodo principal
+secondaryTestDB.isMaster()
+// Activamos permisos de lectura
+connSecondary.setSecondaryOk()
+// Validamos si se actualizó la colección resultados en este nodo
+secondaryTestDB.resultados.count()
+// Buscamos el nodo principal que vamos a detener
+connPrimary = new Mongo("localhost:20000")
+primaryDB = connPrimary.getDB("premier_league")
+primaryDB.isMaster()
+// Y lo detenemos
+primaryDB.adminCommand({shutdown : 1})
+// Obtenemos una nueva conexión al nuevo nodo primario
+connNewPrimary = new Mongo("localhost:20001")
+newPrimaryDB = connNewPrimary.getDB("premier_league")
+newPrimaryDB.isMaster()
+// Detenemos el grupo de réplica
+replicaPremierLeague.stopSet()
