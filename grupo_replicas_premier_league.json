@@ -5,7 +5,7 @@ replicaPremierLeague.startSet()
 // Iniciamos la funcionalida de réplica
 replicaPremierLeague.initiate()
 // Nos conectamos al primer nodo
-conn=new Mongo("Metal2022:20000")
+conn=new Mongo("P-JBOCANEGRA:20000")
 // Obtenemos la bd premier_league
 testDB=conn.getDB("premier_league")
 // Validamos si es el nodo principal
@@ -136,7 +136,7 @@ testDB.resultados.insert([
 // Validamos si se insertaron registros
 testDB.resultados.count()
 // Nos conectamos al segundo nodo
-connSecondary = new Mongo("Metal2022:20001")
+connSecondary = new Mongo("P-JBOCANEGRA:20001")
 secondaryTestDB = connSecondary.getDB("premier_league")
 // Validamos si es el nodo principal
 secondaryTestDB.isMaster()
